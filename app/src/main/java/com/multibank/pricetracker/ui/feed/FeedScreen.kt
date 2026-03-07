@@ -53,7 +53,7 @@ import com.multibank.pricetracker.util.formatPriceChange
 @Composable
 fun FeedScreen(
     onSymbolClick: (String) -> Unit,
-    viewModel: FeedVM = hiltViewModel()
+    viewModel: FeedViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

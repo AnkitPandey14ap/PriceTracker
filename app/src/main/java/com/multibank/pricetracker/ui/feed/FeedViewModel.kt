@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.multibank.pricetracker.Constants.Companion.FLASH_THRESHOLD_PERCENT
 import com.multibank.pricetracker.data.PriceDirection
-import com.multibank.pricetracker.data.StockSymbol
+import com.multibank.pricetracker.data.PriceUpdate
 import com.multibank.pricetracker.data.buildInitialStocks
 import com.multibank.pricetracker.domain.ObserveConnectionStateUseCase
 import com.multibank.pricetracker.domain.ObservePriceUpdatesUseCase
@@ -25,25 +25,21 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-
-
 @HiltViewModel
-class FeedVM @Inject constructor(
+class FeedViewModel @Inject constructor(
     private val startFeedUseCase: StartFeedUseCase,
     private val stopFeedUseCase: StopFeedUseCase,
     private val observePriceUpdatesUseCase: ObservePriceUpdatesUseCase,
-    observeConnectionStateUseCase: ObserveConnectionStateUseCase
+    private val observeConnectionStateUseCase: ObserveConnectionStateUseCase
 ) : ViewModel() {
 
     private val flashJobs = mutableMapOf<String, Job>()
 
     private val initialStocks = buildInitialStocks()
-    private val stockMap = mutableMapOf<String, StockSymbol>()
-        .also { map -> initialStocks.forEach { map[it.symbol] = it } }
+    private val stockMap = initialStocks.associateBy { it.symbol }.toMutableMap()
 
 
     private val _stocksFlow = MutableStateFlow(initialStocks)
-    private val _feedIntent = MutableSharedFlow<FeedIntent>()
     private val _feedSideEffect = MutableSharedFlow<FeedSideEffect>()
     val feedSideEffect = _feedSideEffect.asSharedFlow()
 
@@ -53,7 +49,7 @@ class FeedVM @Inject constructor(
 
     val uiState: StateFlow<FeedUiState> = combine(
         _stocksFlow,
-        observeConnectionStateUseCase.invoke(),
+        observeConnectionStateUseCase(),
         _isFeedRunning,
         _flashMap
     ) { stocks, connectionState, isRunning, flashMap ->
@@ -72,64 +68,29 @@ class FeedVM @Inject constructor(
     init {
         observePriceUpdates()
     }
+
     fun sendIntent(intent: FeedIntent) {
         when (intent) {
             is FeedIntent.SymbolClicked -> _feedSideEffect.tryEmit(
-                FeedSideEffect.NavigateToDetailPage(
-                    intent.id
-                )
+                FeedSideEffect.NavigateToDetailPage(intent.id)
             )
-
             FeedIntent.ToggleConnection -> toggleFeed()
         }
     }
 
     private fun toggleFeed() {
-        if (_isFeedRunning.value) {
-            stopFeedUseCase()
-            _isFeedRunning.value = false
-        } else {
-            startFeedUseCase(initialStocks)
-            _isFeedRunning.value = true
-        }
-    }
+        val running = _isFeedRunning.value
 
-    override fun onCleared() {
-        super.onCleared()
-        flashJobs.values.forEach { it.cancel() }
+        if (running) stopFeedUseCase()
+        else startFeedUseCase(initialStocks)
+
+        _isFeedRunning.value = !running
     }
 
     private fun observePriceUpdates() {
         viewModelScope.launch {
             observePriceUpdatesUseCase().collect { update ->
-                val existing = stockMap[update.symbol] ?: return@collect
-
-                val direction = when {
-                    update.price > existing.currentPrice -> PriceDirection.UP
-                    update.price < existing.currentPrice -> PriceDirection.DOWN
-                    else -> PriceDirection.NEUTRAL
-                }
-
-                val updated = existing.copy(
-                    previousPrice = existing.currentPrice,
-                    currentPrice = update.price,
-                    direction = direction
-                )
-
-                stockMap[update.symbol] = updated
-                _stocksFlow.value = stockMap.values.toList()
-
-                val changePct =
-                    if (existing.currentPrice > 0)
-                        kotlin.math.abs(
-                            (update.price - existing.currentPrice) /
-                                    existing.currentPrice * 100.0
-                        )
-                    else 0.0
-
-                if (direction != PriceDirection.NEUTRAL && changePct >= FLASH_THRESHOLD_PERCENT) {
-                    triggerFlash(update.symbol, direction == PriceDirection.UP)
-                }
+                processPriceUpdate(update)
             }
         }
     }
@@ -141,6 +102,34 @@ class FeedVM @Inject constructor(
             delay(1000)
             _flashMap.update { it + (symbol to null) }
         }
+    }
+
+    private fun processPriceUpdate(update: PriceUpdate) {
+        val existing = stockMap[update.symbol] ?: return
+
+        val direction = PriceUtil.priceDirection(update.price, existing.currentPrice)
+
+        val updated = existing.copy(
+            previousPrice = existing.currentPrice,
+            currentPrice = update.price,
+            direction = direction
+        )
+
+        stockMap[update.symbol] = updated
+        _stocksFlow.value = stockMap.values.toList()
+
+        val changePct = PriceUtil.priceChangePercent(update.price, existing.currentPrice)
+
+        if (direction != PriceDirection.NEUTRAL &&
+            changePct >= FLASH_THRESHOLD_PERCENT
+        ) {
+            triggerFlash(update.symbol, direction == PriceDirection.UP)
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        flashJobs.values.forEach { it.cancel() }
     }
 
 
