@@ -2,10 +2,14 @@ package com.multibank.pricetracker.ui.feed
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.multibank.pricetracker.Constants.Companion.FLASH_THRESHOLD_PERCENT
 import com.multibank.pricetracker.data.PriceDirection
 import com.multibank.pricetracker.data.StockSymbol
-import com.multibank.pricetracker.data.WebSocketRepository
 import com.multibank.pricetracker.data.buildInitialStocks
+import com.multibank.pricetracker.domain.ObserveConnectionStateUseCase
+import com.multibank.pricetracker.domain.ObservePriceUpdatesUseCase
+import com.multibank.pricetracker.domain.StartFeedUseCase
+import com.multibank.pricetracker.domain.StopFeedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -20,12 +24,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-private const val FLASH_THRESHOLD_PERCENT = 1.0
+
 
 
 @HiltViewModel
 class FeedVM @Inject constructor(
-    private val repository: WebSocketRepository
+    private val startFeedUseCase: StartFeedUseCase,
+    private val stopFeedUseCase: StopFeedUseCase,
+    private val observePriceUpdatesUseCase: ObservePriceUpdatesUseCase,
+    observeConnectionStateUseCase: ObserveConnectionStateUseCase
 ) : ViewModel() {
 
     private val flashJobs = mutableMapOf<String, Job>()
@@ -46,7 +53,7 @@ class FeedVM @Inject constructor(
 
     val uiState: StateFlow<FeedUiState> = combine(
         _stocksFlow,
-        repository.connectionState,
+        observeConnectionStateUseCase.invoke(),
         _isFeedRunning,
         _flashMap
     ) { stocks, connectionState, isRunning, flashMap ->
@@ -79,10 +86,10 @@ class FeedVM @Inject constructor(
 
     private fun toggleFeed() {
         if (_isFeedRunning.value) {
-            repository.stop()
+            stopFeedUseCase()
             _isFeedRunning.value = false
         } else {
-            repository.start(initialStocks)
+            startFeedUseCase(initialStocks)
             _isFeedRunning.value = true
         }
     }
@@ -94,25 +101,32 @@ class FeedVM @Inject constructor(
 
     private fun observePriceUpdates() {
         viewModelScope.launch {
-            repository.priceUpdates.collect { update ->
+            observePriceUpdatesUseCase().collect { update ->
                 val existing = stockMap[update.symbol] ?: return@collect
+
                 val direction = when {
                     update.price > existing.currentPrice -> PriceDirection.UP
                     update.price < existing.currentPrice -> PriceDirection.DOWN
                     else -> PriceDirection.NEUTRAL
                 }
+
                 val updated = existing.copy(
                     previousPrice = existing.currentPrice,
                     currentPrice = update.price,
                     direction = direction
                 )
+
                 stockMap[update.symbol] = updated
                 _stocksFlow.value = stockMap.values.toList()
 
-                // Only flash if the change is significant (>= 1%)
-                val changePct = if (existing.currentPrice > 0)
-                    kotlin.math.abs((update.price - existing.currentPrice) / existing.currentPrice * 100.0)
-                else 0.0
+                val changePct =
+                    if (existing.currentPrice > 0)
+                        kotlin.math.abs(
+                            (update.price - existing.currentPrice) /
+                                    existing.currentPrice * 100.0
+                        )
+                    else 0.0
+
                 if (direction != PriceDirection.NEUTRAL && changePct >= FLASH_THRESHOLD_PERCENT) {
                     triggerFlash(update.symbol, direction == PriceDirection.UP)
                 }

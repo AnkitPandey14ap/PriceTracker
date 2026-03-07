@@ -11,12 +11,7 @@ import androidx.navigation.navDeepLink
 import com.multibank.pricetracker.ui.detail.SymbolDetailScreen
 import com.multibank.pricetracker.ui.feed.FeedScreen
 
-sealed class Screen(val route: String) {
-    data object Feed : Screen("feed")
-    data object Detail : Screen("detail/{symbol}") {
-        fun createRoute(symbol: String) = "detail/$symbol"
-    }
-}
+
 
 @Composable
 fun PriceTrackerNavHost(intent: Intent? = null) {
