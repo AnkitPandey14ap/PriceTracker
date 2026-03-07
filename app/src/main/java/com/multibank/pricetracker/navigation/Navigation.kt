@@ -1,7 +1,6 @@
-package com.pricetracker.app.navigation
+package com.multibank.pricetracker.navigation
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -9,8 +8,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.pricetracker.app.ui.detail.SymbolDetailScreen
-import com.pricetracker.app.ui.feed.FeedScreen
+import com.multibank.pricetracker.ui.detail.SymbolDetailScreen
+import com.multibank.pricetracker.ui.feed.FeedScreen
 
 sealed class Screen(val route: String) {
     data object Feed : Screen("feed")

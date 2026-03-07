@@ -1,4 +1,6 @@
 package com.multibank.pricetracker.ui.feed
 
-class FeedIntent {
+sealed class FeedIntent {
+    data class SymbolClicked(val id: String) : FeedIntent()
+    object ToggleConnection : FeedIntent()
 }
