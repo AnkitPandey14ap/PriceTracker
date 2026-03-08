@@ -1,4 +1,7 @@
-package com.multibank.pricetracker.data
+package com.multibank.pricetracker.mock
+
+import com.multibank.pricetracker.data.PriceDirectionDto
+import com.multibank.pricetracker.data.StockSymbolDto
 
 val STOCK_METADATA: Map<String, String> = mapOf(
         "AAPL" to "Apple Inc. — global technology company known for iPhone, Mac computers, iPad tablets, and wearable devices.",

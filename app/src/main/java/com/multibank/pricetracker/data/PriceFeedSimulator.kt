@@ -8,7 +8,7 @@ import kotlin.random.Random
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val PRICE_UPDATE_INTERVAL_MS = 1500L
+private const val PRICE_UPDATE_INTERVAL_MS = 2000L
 
 /**
  * Produces a flow of simulated "SYMBOL:PRICE" messages at a fixed interval.
