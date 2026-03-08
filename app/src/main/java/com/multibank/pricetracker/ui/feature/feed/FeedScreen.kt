@@ -79,7 +79,10 @@ fun FeedScreen(
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        ConnectionDot(state = uiState.connectionState)
+                        ConnectionDot(
+                            state = uiState.connectionState,
+                            modifier = Modifier.semantics { testTag = "feed_connection_dot" }
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Price Tracker",
@@ -122,7 +125,8 @@ fun FeedScreen(
                     stock = stock,
                     rank = index + 1,
                     flashState = flashState,
-                    onClick = { onSymbolClick(stock.symbol) }
+                    onClick = { onSymbolClick(stock.symbol) },
+                    modifier = Modifier.semantics { testTag = "feed_stock_row_${stock.symbol}" }
                 )
             }
             item {
@@ -169,14 +173,17 @@ private fun ToggleFeedButton(
 
 
 @Composable
-private fun ConnectionDot(state: ConnectionStateUi) {
+private fun ConnectionDot(
+    state: ConnectionStateUi,
+    modifier: Modifier = Modifier
+) {
     val color = when (state) {
         is ConnectionStateUi.Connected -> Color(0xFF4CAF50)
         is ConnectionStateUi.Disconnected -> Color(0xFFF44336)
         is ConnectionStateUi.Connecting -> Color(0xFFFF9800)
     }
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(11.dp)
             .clip(CircleShape)
             .background(color)
@@ -189,7 +196,8 @@ private fun StockRow(
     stock: FeedItemUi,
     rank: Int,
     flashState: Boolean?,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val defaultCardColor = MaterialTheme.colorScheme.surface
     val flashGreen = Color(0xFF4CAF50).copy(alpha = 0.12f)
@@ -209,7 +217,7 @@ private fun StockRow(
 
     Card(
         shape = RoundedCornerShape(CornerSize(4)),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp)
             .clickable { onClick() },

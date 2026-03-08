@@ -139,7 +139,9 @@ private fun DetailContent(
     ) {
         // Price card
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .semantics { testTag = "detail_price_card" },
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             colors = CardDefaults.cardColors(
@@ -155,7 +157,8 @@ private fun DetailContent(
                         text = formatPrice(stock.currentPrice),
                         style = MaterialTheme.typography.displaySmall,
                         fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.semantics { testTag = "detail_price_value" }
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     val arrow = when (stock.direction) {
@@ -185,13 +188,17 @@ private fun DetailContent(
                     text = formatPriceChange(stock.priceChange, stock.priceChangePercent),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = changeColor
+                    color = changeColor,
+                    modifier = Modifier.semantics { testTag = "detail_change_value" }
                 )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
                 // Connection state
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.semantics { testTag = "detail_connection_state" }
+                ) {
                     val dotColor = when (connectionState) {
                         is ConnectionStateUi.Connected    -> Color(0xFF4CAF50)
                         is ConnectionStateUi.Disconnected -> Color(0xFFF44336)
@@ -248,7 +255,9 @@ private fun DetailContent(
 
         // Stats card
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .semantics { testTag = "detail_market_stats" },
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
             colors = CardDefaults.cardColors(
@@ -265,7 +274,7 @@ private fun DetailContent(
                     fontWeight = FontWeight.Bold
                 )
                 StatRow(label = "Symbol", value = stock.symbol)
-                StatRow(label = "Current Price", value = formatPrice(stock.currentPrice))
+                StatRow(label = "Current Price", value = formatPrice(stock.currentPrice), valueTestTag = "detail_stats_current_price")
                 StatRow(label = "Previous Price", value = if (stock.previousPrice > 0) formatPrice(stock.previousPrice) else "—")
                 StatRow(label = "Change", value = formatPriceChange(stock.priceChange, stock.priceChangePercent))
             }
@@ -277,13 +286,15 @@ private fun DetailContent(
             text = "Prices update every 2 seconds via WebSocket echo",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .semantics { testTag = "detail_footer" }
         )
     }
 }
 
 @Composable
-private fun StatRow(label: String, value: String) {
+private fun StatRow(label: String, value: String, valueTestTag: String? = null) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -297,7 +308,8 @@ private fun StatRow(label: String, value: String) {
             text = value,
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = valueTestTag?.let { Modifier.semantics { testTag = it } } ?: Modifier
         )
     }
 }

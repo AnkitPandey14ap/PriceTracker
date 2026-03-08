@@ -113,4 +113,60 @@ class FeedScreenTest {
 
         assert(clickedSymbol == "NVDA")
     }
+
+    @Test
+    fun feedScreen_emptyList_showsNoStockRows() {
+        val fakeVm = FakeFeedViewModel(
+            FeedUiState(stocks = emptyList(), connectionState = ConnectionStateUi.Disconnected, isFeedRunning = false)
+        )
+
+        composeTestRule.setContent {
+            MultibankPriceTrackerTheme {
+                FeedScreen(onSymbolClick = {}, viewModel = fakeVm)
+            }
+        }
+
+        composeTestRule.onNodeWithText("Price Tracker").assertExists()
+        composeTestRule.onNodeWithTag("feed_toggle_button").assertExists()
+        composeTestRule.onNodeWithTag("feed_stock_row_AAPL").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("feed_stock_row_GOOG").assertDoesNotExist()
+    }
+
+    @Test
+    fun feedScreen_stockRow_showsPriceAndChange() {
+        val fakeVm = FakeFeedViewModel(
+            FeedUiState(
+                stocks = listOf(
+                    FeedItemUi("MSFT", 400.50, 398.0, PriceDirectionUi.UP, "Microsoft")
+                ),
+                connectionState = ConnectionStateUi.Connected,
+                isFeedRunning = false
+            )
+        )
+
+        composeTestRule.setContent {
+            MultibankPriceTrackerTheme {
+                FeedScreen(onSymbolClick = {}, viewModel = fakeVm)
+            }
+        }
+
+        composeTestRule.onNodeWithTag("feed_stock_row_MSFT").assertExists()
+        composeTestRule.onNodeWithText("$400.50").assertExists()
+        composeTestRule.onNodeWithText("+$2.50 (+0.63%)").assertExists()
+    }
+
+    @Test
+    fun feedScreen_connectionDot_exists() {
+        val fakeVm = FakeFeedViewModel(
+            FeedUiState(stocks = emptyList(), connectionState = ConnectionStateUi.Connecting, isFeedRunning = true)
+        )
+
+        composeTestRule.setContent {
+            MultibankPriceTrackerTheme {
+                FeedScreen(onSymbolClick = {}, viewModel = fakeVm)
+            }
+        }
+
+        composeTestRule.onNodeWithTag("feed_connection_dot").assertExists()
+    }
 }
