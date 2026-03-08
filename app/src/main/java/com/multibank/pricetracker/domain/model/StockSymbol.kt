@@ -1,8 +1,4 @@
-package com.multibank.pricetracker.data
-
-enum class PriceDirection {
-    UP, DOWN, NEUTRAL
-}
+package com.multibank.pricetracker.domain.model
 
 data class StockSymbol(
     val symbol: String,

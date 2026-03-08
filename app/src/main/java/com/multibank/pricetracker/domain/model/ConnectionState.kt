@@ -1,4 +1,4 @@
-package com.multibank.pricetracker.ui.feed
+package com.multibank.pricetracker.domain.model
 
 sealed class ConnectionState {
     data object Connected : ConnectionState()

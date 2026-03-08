@@ -1,8 +1,8 @@
 package com.multibank.pricetracker.ui.feed
 
-import com.multibank.pricetracker.data.PriceDirection
+import com.multibank.pricetracker.domain.model.PriceDirection
 
-object PriceUtil{
+object PriceUtil {
     fun priceDirection(new: Double, old: Double): PriceDirection =
         when {
             new > old -> PriceDirection.UP

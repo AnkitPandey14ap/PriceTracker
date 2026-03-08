@@ -41,9 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.multibank.pricetracker.data.PriceDirection
-import com.multibank.pricetracker.data.StockSymbol
-import com.multibank.pricetracker.ui.feed.ConnectionState
+import com.multibank.pricetracker.ui.feed.model.ConnectionStateUi
+import com.multibank.pricetracker.ui.feed.model.FeedItemUi
+import com.multibank.pricetracker.ui.feed.model.PriceDirectionUi
 import com.multibank.pricetracker.util.formatPrice
 import com.multibank.pricetracker.util.formatPriceChange
 
@@ -111,8 +111,8 @@ fun SymbolDetailScreen(
 
 @Composable
 private fun DetailContent(
-    stock: StockSymbol,
-    connectionState: ConnectionState
+    stock: FeedItemUi,
+    connectionState: ConnectionStateUi
 ) {
     Column(
         modifier = Modifier
@@ -142,14 +142,14 @@ private fun DetailContent(
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     val arrow = when (stock.direction) {
-                        PriceDirection.UP      -> "↑"
-                        PriceDirection.DOWN    -> "↓"
-                        PriceDirection.NEUTRAL -> "—"
+                        PriceDirectionUi.UP      -> "↑"
+                        PriceDirectionUi.DOWN    -> "↓"
+                        PriceDirectionUi.NEUTRAL -> "—"
                     }
                     val arrowColor = when (stock.direction) {
-                        PriceDirection.UP      -> Color(0xFF4CAF50)
-                        PriceDirection.DOWN    -> Color(0xFFF44336)
-                        PriceDirection.NEUTRAL -> MaterialTheme.colorScheme.onSurfaceVariant
+                        PriceDirectionUi.UP      -> Color(0xFF4CAF50)
+                        PriceDirectionUi.DOWN    -> Color(0xFFF44336)
+                        PriceDirectionUi.NEUTRAL -> MaterialTheme.colorScheme.onSurfaceVariant
                     }
                     Text(
                         text = arrow,
@@ -160,9 +160,9 @@ private fun DetailContent(
                 }
 
                 val changeColor = when (stock.direction) {
-                    PriceDirection.UP      -> Color(0xFF4CAF50)
-                    PriceDirection.DOWN    -> Color(0xFFF44336)
-                    PriceDirection.NEUTRAL -> MaterialTheme.colorScheme.onSurfaceVariant
+                    PriceDirectionUi.UP      -> Color(0xFF4CAF50)
+                    PriceDirectionUi.DOWN    -> Color(0xFFF44336)
+                    PriceDirectionUi.NEUTRAL -> MaterialTheme.colorScheme.onSurfaceVariant
                 }
                 Text(
                     text = formatPriceChange(stock.priceChange, stock.priceChangePercent),
@@ -176,14 +176,14 @@ private fun DetailContent(
                 // Connection state
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     val dotColor = when (connectionState) {
-                        is ConnectionState.Connected    -> Color(0xFF4CAF50)
-                        is ConnectionState.Disconnected -> Color(0xFFF44336)
-                        is ConnectionState.Connecting   -> Color(0xFFFF9800)
+                        is ConnectionStateUi.Connected    -> Color(0xFF4CAF50)
+                        is ConnectionStateUi.Disconnected -> Color(0xFFF44336)
+                        is ConnectionStateUi.Connecting   -> Color(0xFFFF9800)
                     }
                     val stateLabel = when (connectionState) {
-                        is ConnectionState.Connected    -> "Live"
-                        is ConnectionState.Disconnected -> "Disconnected"
-                        is ConnectionState.Connecting   -> "Connecting…"
+                        is ConnectionStateUi.Connected    -> "Live"
+                        is ConnectionStateUi.Disconnected -> "Disconnected"
+                        is ConnectionStateUi.Connecting   -> "Connecting…"
                     }
                     Box(
                         modifier = Modifier

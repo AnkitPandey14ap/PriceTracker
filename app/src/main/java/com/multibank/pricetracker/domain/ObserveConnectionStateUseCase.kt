@@ -1,6 +1,6 @@
 package com.multibank.pricetracker.domain
 
-import com.multibank.pricetracker.ui.feed.ConnectionState
+import com.multibank.pricetracker.domain.model.ConnectionState
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 

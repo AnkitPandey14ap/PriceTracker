@@ -27,13 +27,13 @@ val STOCK_METADATA: Map<String, String> = mapOf(
         "RIVN" to "Rivian — electric vehicle manufacturer producing trucks and adventure-focused EVs.",
         "ROKU" to "Roku — digital media company providing streaming devices and smart TV platforms."
     )
-fun buildInitialStocks(): List<StockSymbol> =
+fun buildInitialStocks(): List<StockSymbolDto> =
     STOCK_METADATA.map { (symbol, description) ->
-        StockSymbol(
+        StockSymbolDto(
             symbol = symbol,
             currentPrice = (50..500).random().toDouble() + (0..99).random() / 100.0,
             previousPrice = 0.0,
-            direction = PriceDirection.NEUTRAL,
+            direction = PriceDirectionDto.NEUTRAL,
             description = description
         )
     }

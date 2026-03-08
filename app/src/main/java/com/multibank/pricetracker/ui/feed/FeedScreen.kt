@@ -44,8 +44,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.multibank.pricetracker.ToastHelper
-import com.multibank.pricetracker.data.PriceDirection
-import com.multibank.pricetracker.data.StockSymbol
+import com.multibank.pricetracker.ui.feed.model.ConnectionStateUi
+import com.multibank.pricetracker.ui.feed.model.FeedItemUi
+import com.multibank.pricetracker.ui.feed.model.PriceDirectionUi
 import com.multibank.pricetracker.util.formatPrice
 import com.multibank.pricetracker.util.formatPriceChange
 
@@ -156,11 +157,11 @@ private fun ToggleFeedButton(isRunning: Boolean, onClick: () -> Unit) {
 
 
 @Composable
-private fun ConnectionDot(state: ConnectionState) {
+private fun ConnectionDot(state: ConnectionStateUi) {
     val color = when (state) {
-        is ConnectionState.Connected -> Color(0xFF4CAF50)
-        is ConnectionState.Disconnected -> Color(0xFFF44336)
-        is ConnectionState.Connecting -> Color(0xFFFF9800)
+        is ConnectionStateUi.Connected -> Color(0xFF4CAF50)
+        is ConnectionStateUi.Disconnected -> Color(0xFFF44336)
+        is ConnectionStateUi.Connecting -> Color(0xFFFF9800)
     }
     Box(
         modifier = Modifier
@@ -173,7 +174,7 @@ private fun ConnectionDot(state: ConnectionState) {
 
 @Composable
 private fun StockRow(
-    stock: StockSymbol,
+    stock: FeedItemUi,
     rank: Int,
     flashState: Boolean?,
     onClick: () -> Unit
@@ -228,14 +229,14 @@ private fun StockRow(
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     val arrow = when (stock.direction) {
-                        PriceDirection.UP -> "↑"
-                        PriceDirection.DOWN -> "↓"
-                        PriceDirection.NEUTRAL -> "—"
+                        PriceDirectionUi.UP -> "↑"
+                        PriceDirectionUi.DOWN -> "↓"
+                        PriceDirectionUi.NEUTRAL -> "—"
                     }
                     val arrowColor = when (stock.direction) {
-                        PriceDirection.UP -> Color(0xFF4CAF50)
-                        PriceDirection.DOWN -> Color(0xFFF44336)
-                        PriceDirection.NEUTRAL -> MaterialTheme.colorScheme.onSurfaceVariant
+                        PriceDirectionUi.UP -> Color(0xFF4CAF50)
+                        PriceDirectionUi.DOWN -> Color(0xFFF44336)
+                        PriceDirectionUi.NEUTRAL -> MaterialTheme.colorScheme.onSurfaceVariant
                     }
                     Text(
                         text = arrow,
@@ -248,9 +249,9 @@ private fun StockRow(
                     text = formatPriceChange(stock.priceChange, stock.priceChangePercent),
                     style = MaterialTheme.typography.labelSmall,
                     color = when (stock.direction) {
-                        PriceDirection.UP -> Color(0xFF4CAF50)
-                        PriceDirection.DOWN -> Color(0xFFF44336)
-                        PriceDirection.NEUTRAL -> MaterialTheme.colorScheme.onSurfaceVariant
+                        PriceDirectionUi.UP -> Color(0xFF4CAF50)
+                        PriceDirectionUi.DOWN -> Color(0xFFF44336)
+                        PriceDirectionUi.NEUTRAL -> MaterialTheme.colorScheme.onSurfaceVariant
                     }
                 )
             }

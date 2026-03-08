@@ -1,6 +1,6 @@
 package com.multibank.pricetracker.domain
 
-import com.multibank.pricetracker.data.PriceUpdate
+import com.multibank.pricetracker.domain.model.PriceUpdate
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

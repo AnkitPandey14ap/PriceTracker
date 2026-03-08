@@ -4,14 +4,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.multibank.pricetracker.Constants.Companion.FLASH_THRESHOLD_PERCENT
-import com.multibank.pricetracker.data.PriceDirection
-import com.multibank.pricetracker.data.StockSymbol
-import com.multibank.pricetracker.data.buildInitialStocks
+import com.multibank.pricetracker.domain.GetInitialSymbolsUseCase
+import com.multibank.pricetracker.domain.model.PriceDirection
+import com.multibank.pricetracker.domain.model.StockSymbol
 import com.multibank.pricetracker.domain.ObserveConnectionStateUseCase
 import com.multibank.pricetracker.domain.ObservePriceUpdatesUseCase
-import com.multibank.pricetracker.domain.StartFeedUseCase
-import com.multibank.pricetracker.domain.StopFeedUseCase
-import com.multibank.pricetracker.ui.feed.ConnectionState
+import com.multibank.pricetracker.ui.feed.mapper.FeedMapper
+import com.multibank.pricetracker.ui.feed.model.ConnectionStateUi
+import com.multibank.pricetracker.ui.feed.model.FeedItemUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -20,31 +20,27 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.abs
 
-
 data class DetailUiState(
-    val stock: StockSymbol? = null,
-    val flash: Boolean? = null, // true=green, false=red, null=none
-    val connectionState: ConnectionState = ConnectionState.Disconnected
+    val stock: FeedItemUi? = null,
+    val flash: Boolean? = null,
+    val connectionState: ConnectionStateUi = ConnectionStateUi.Disconnected
 )
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val startFeedUseCase: StartFeedUseCase,
-    private val stopFeedUseCase: StopFeedUseCase,
+    getInitialSymbolsUseCase: GetInitialSymbolsUseCase,
     private val observePriceUpdatesUseCase: ObservePriceUpdatesUseCase,
     observeConnectionStateUseCase: ObserveConnectionStateUseCase
 ) : ViewModel() {
 
-    // Symbol retrieved via SavedStateHandle from navigation argument
     private val symbol: String = checkNotNull(savedStateHandle["symbol"])
 
-    private val initialStock = buildInitialStocks().first { it.symbol == symbol }
+    private val initialStock: StockSymbol = getInitialSymbolsUseCase().first { it.symbol == symbol }
     private val _stock = MutableStateFlow(initialStock)
     private val _flash = MutableStateFlow<Boolean?>(null)
 
@@ -53,11 +49,15 @@ class DetailViewModel @Inject constructor(
         _flash,
         observeConnectionStateUseCase()
     ) { stock, flash, connectionState ->
-        DetailUiState(stock = stock, flash = flash, connectionState = connectionState)
+        DetailUiState(
+            stock = with(FeedMapper) { stock.toFeedItemUi() },
+            flash = flash,
+            connectionState = with(FeedMapper) { connectionState.toConnectionStateUi() }
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = DetailUiState(stock = initialStock)
+        initialValue = DetailUiState(stock = with(FeedMapper) { initialStock.toFeedItemUi() })
     )
 
     private var flashJob: Job? = null

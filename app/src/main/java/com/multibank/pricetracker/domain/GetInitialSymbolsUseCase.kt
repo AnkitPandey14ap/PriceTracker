@@ -3,10 +3,8 @@ package com.multibank.pricetracker.domain
 import com.multibank.pricetracker.domain.model.StockSymbol
 import javax.inject.Inject
 
-class StartFeedUseCase @Inject constructor(
+class GetInitialSymbolsUseCase @Inject constructor(
     private val repository: PriceFeedRepository
 ) {
-    operator fun invoke(symbols: List<StockSymbol>) {
-        repository.start(symbols)
-    }
+    operator fun invoke(): List<StockSymbol> = repository.getInitialSymbols()
 }
