@@ -64,17 +64,11 @@ fun FeedScreen(
 
 
     LaunchedEffect(Unit) {
-        val sideEffectHandlers: Map<KClass<out FeedSideEffect>, (FeedSideEffect) -> Unit> = mapOf(
-            FeedSideEffect.NavigateToDetailPage::class to { e ->
-                onSymbolClick((e as FeedSideEffect.NavigateToDetailPage).id)
-            },
-            FeedSideEffect.ShowToast::class to { e ->
-                ToastHelper.show(context, (e as FeedSideEffect.ShowToast).text)
+        viewModel.feedSideEffect.collect {
+            when (it) {
+                is FeedSideEffect.NavigateToDetailPage -> onSymbolClick(it.id)
+                is FeedSideEffect.ShowToast -> ToastHelper.show(context, it.text)
             }
-        )
-        viewModel.feedSideEffect.collect { effect ->
-            sideEffectHandlers[effect::class]?.invoke(effect)
-                ?: error("No handler for side effect: ${effect::class.simpleName}")
         }
     }
     Scaffold(

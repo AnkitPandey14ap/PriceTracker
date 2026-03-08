@@ -75,13 +75,6 @@ class FeedViewModel @Inject constructor(
         )
     )
 
-    private val intentHandlers: Map<KClass<out FeedIntent>, (FeedIntent) -> Unit> = mapOf(
-        FeedIntent.SymbolClicked::class to { e ->
-            _feedSideEffect.tryEmit(FeedSideEffect.NavigateToDetailPage((e as FeedIntent.SymbolClicked).id))
-        },
-        FeedIntent.ToggleConnection::class to { _ -> toggleFeed() }
-    )
-
     init {
         observePriceUpdates()
         observeErrors()
@@ -98,8 +91,12 @@ class FeedViewModel @Inject constructor(
     }
 
     fun sendIntent(intent: FeedIntent) {
-        intentHandlers[intent::class]?.invoke(intent)
-            ?: error("No handler registered for intent: ${intent::class.simpleName}")
+        when (intent) {
+            is FeedIntent.SymbolClicked -> _feedSideEffect.tryEmit(
+                FeedSideEffect.NavigateToDetailPage(intent.id)
+            )
+            FeedIntent.ToggleConnection -> toggleFeed()
+        }
     }
 
     private fun toggleFeed() {

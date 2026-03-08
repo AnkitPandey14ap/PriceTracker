@@ -3,8 +3,25 @@
 /local.properties
 /.idea/
 .DS_Store
-/build
 /captures
 .externalNativeBuild
 .cxx
 local.properties
+
+# Module build outputs (explicit)
+domain/build
+data/build
+app/build
+
+# Compiled classes and Kotlin/Java outputs
+*.class
+.kotlin/
+out/
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Android build artifacts
+*.apk
+*.ap_
+*.aab
+/build/reports/problems/problems-report.html
