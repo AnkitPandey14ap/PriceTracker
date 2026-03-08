@@ -1,13 +1,17 @@
 package com.multibank.pricetracker.data.datasource.websocket
 
+import com.multibank.pricetracker.data.datasource.PriceMessageParser
 import com.multibank.pricetracker.data.dto.PriceUpdateDto
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
- * Pure parser for "SYMBOL:PRICE" WebSocket messages. No side effects (no logging).
+ * Parses "SYMBOL:PRICE" WebSocket messages. No side effects (no logging).
  */
-object PriceMessageParser {
+@Singleton
+class DefaultPriceMessageParser @Inject constructor() : PriceMessageParser {
 
-    fun parse(message: String): PriceUpdateDto? {
+    override fun parse(message: String): PriceUpdateDto? {
         val parts = message.trim().split(":")
         if (parts.size != 2) return null
         val symbol = parts[0].trim()

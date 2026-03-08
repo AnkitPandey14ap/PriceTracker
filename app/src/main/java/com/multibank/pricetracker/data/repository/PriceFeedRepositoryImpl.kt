@@ -1,42 +1,38 @@
 package com.multibank.pricetracker.data.repository
 
-import com.multibank.pricetracker.data.datasource.websocket.PriceMessageParser
-import com.multibank.pricetracker.data.datasource.websocket.WebSocketService
-import com.multibank.pricetracker.data.mapper.PriceUpdateMapper
-import com.multibank.pricetracker.data.mapper.StockSymbolMapper
+import com.multibank.pricetracker.data.datasource.InitialSymbolsSource
+import com.multibank.pricetracker.data.datasource.PriceFeedDataSource
 import com.multibank.pricetracker.domain.repository.PriceFeedRepository
 import com.multibank.pricetracker.domain.model.ConnectionStateEntity
 import com.multibank.pricetracker.domain.model.PriceUpdateEntity
 import com.multibank.pricetracker.domain.model.StockSymbolEntity
-import com.multibank.pricetracker.data.mock.buildInitialStocks
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 
 class PriceFeedRepositoryImpl @Inject constructor(
-    private val webSocketService: WebSocketService
+    private val priceFeedDataSource: PriceFeedDataSource,
+    private val initialSymbolsSource: InitialSymbolsSource
 ) : PriceFeedRepository {
 
     override val connectionState: StateFlow<ConnectionStateEntity>
-        get() = webSocketService.connectionState
+        get() = priceFeedDataSource.connectionState
 
     override val errorMessages: SharedFlow<String>
-        get() = webSocketService.errorMessages
+        get() = priceFeedDataSource.errorMessages
 
     override fun getInitialSymbols(): List<StockSymbolEntity> =
-        buildInitialStocks().map { StockSymbolMapper.toDomain(it) }
+        initialSymbolsSource.getInitialSymbols()
 
     override val priceUpdates: Flow<PriceUpdateEntity> =
-        webSocketService.messages.mapNotNull { PriceMessageParser.parse(it) }.map { PriceUpdateMapper.toDomain(it) }
+        priceFeedDataSource.priceUpdates
 
     override fun start(symbols: List<StockSymbolEntity>) {
-        webSocketService.start(symbols.map { StockSymbolMapper.toDto(it) })
+        priceFeedDataSource.start(symbols)
     }
 
     override fun stop() {
-        webSocketService.stop()
+        priceFeedDataSource.stop()
     }
 }

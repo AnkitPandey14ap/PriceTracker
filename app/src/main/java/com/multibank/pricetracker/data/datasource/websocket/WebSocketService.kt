@@ -1,15 +1,23 @@
 package com.multibank.pricetracker.data.datasource.websocket
 
-import com.multibank.pricetracker.data.dto.StockSymbolDto
+import com.multibank.pricetracker.data.datasource.PriceFeedDataSource
+import com.multibank.pricetracker.data.datasource.PriceMessageParser
+import com.multibank.pricetracker.data.mapper.PriceUpdateMapper
+import com.multibank.pricetracker.data.mapper.StockSymbolMapper
 import com.multibank.pricetracker.domain.model.ConnectionStateEntity
+import com.multibank.pricetracker.domain.model.PriceUpdateEntity
+import com.multibank.pricetracker.domain.model.StockSymbolEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,8 +25,8 @@ import javax.inject.Singleton
 private const val WS_URL = "wss://ws.postman-echo.com/raw"
 
 /**
- * Orchestrates WebSocket connection and simulated price feed.
- * Delegates to [WebSocketTransport] and [PriceFeedSimulator].
+ * WebSocket-based implementation of [PriceFeedDataSource].
+ * Orchestrates [WebSocketTransport] and [PriceFeedSimulator].
  *
  * - Connects once; no automatic retry. On failure or timeout, emits to [errorMessages] (first only) and stops.
  * - Resets "first failure" flag when [ConnectionStateEntity] becomes Connected or on stop().
@@ -26,8 +34,9 @@ private const val WS_URL = "wss://ws.postman-echo.com/raw"
 @Singleton
 class WebSocketService @Inject constructor(
     private val transport: WebSocketTransport,
-    private val simulator: PriceFeedSimulator
-) {
+    private val simulator: PriceFeedSimulator,
+    private val messageParser: PriceMessageParser
+) : PriceFeedDataSource {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private var isRunning = false
@@ -38,20 +47,26 @@ class WebSocketService @Inject constructor(
     private var hasEmittedErrorThisRun = false
 
     private val _userErrorMessages = MutableSharedFlow<String>(replay = 0)
+
+    override val connectionState: StateFlow<ConnectionStateEntity> = transport.connectionState
+
+    override val priceUpdates: Flow<PriceUpdateEntity> =
+        transport.messages
+            .mapNotNull { messageParser.parse(it) }
+            .map { PriceUpdateMapper.toDomain(it) }
+
     /** User-facing errors: only the first failure per run (resets on Connected or stop()). */
-    val errorMessages: SharedFlow<String> = _userErrorMessages.asSharedFlow()
+    override val errorMessages: SharedFlow<String> = _userErrorMessages.asSharedFlow()
 
-    val connectionState: StateFlow<ConnectionStateEntity> = transport.connectionState
-    val messages: SharedFlow<String> = transport.messages
-
-    fun start(symbols: List<StockSymbolDto>) {
+    override fun start(symbols: List<StockSymbolEntity>) {
         if (isRunning) return
         isRunning = true
         hasEmittedErrorThisRun = false
 
         transport.connect(WS_URL)
+        val symbolsDto = symbols.map { StockSymbolMapper.toDto(it) }
         simulatorJob = scope.launch {
-            simulator.run(symbols).collect { message ->
+            simulator.run(symbolsDto).collect { message ->
                 transport.send(message)
             }
         }
@@ -74,7 +89,7 @@ class WebSocketService @Inject constructor(
         }
     }
 
-    fun stop() {
+    override fun stop() {
         isRunning = false
         hasEmittedErrorThisRun = false
         errorForwarderJob?.cancel()

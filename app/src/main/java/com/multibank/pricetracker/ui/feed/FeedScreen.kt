@@ -47,6 +47,7 @@ import com.multibank.pricetracker.ToastHelper
 import com.multibank.pricetracker.ui.feed.mvi.FeedIntent
 import com.multibank.pricetracker.ui.feed.mvi.FeedSideEffect
 import com.multibank.pricetracker.ui.feed.bean.ConnectionStateUi
+import kotlin.reflect.KClass
 import com.multibank.pricetracker.ui.feed.bean.FeedItemUi
 import com.multibank.pricetracker.ui.feed.bean.PriceDirectionUi
 import com.multibank.pricetracker.util.formatPrice
@@ -63,11 +64,17 @@ fun FeedScreen(
 
 
     LaunchedEffect(Unit) {
-        viewModel.feedSideEffect.collect {
-            when (it) {
-                is FeedSideEffect.NavigateToDetailPage -> onSymbolClick(it.id)
-                is FeedSideEffect.ShowToast -> ToastHelper.show(context, it.text)
+        val sideEffectHandlers: Map<KClass<out FeedSideEffect>, (FeedSideEffect) -> Unit> = mapOf(
+            FeedSideEffect.NavigateToDetailPage::class to { e ->
+                onSymbolClick((e as FeedSideEffect.NavigateToDetailPage).id)
+            },
+            FeedSideEffect.ShowToast::class to { e ->
+                ToastHelper.show(context, (e as FeedSideEffect.ShowToast).text)
             }
+        )
+        viewModel.feedSideEffect.collect { effect ->
+            sideEffectHandlers[effect::class]?.invoke(effect)
+                ?: error("No handler for side effect: ${effect::class.simpleName}")
         }
     }
     Scaffold(

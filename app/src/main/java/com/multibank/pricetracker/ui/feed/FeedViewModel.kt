@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.reflect.KClass
 import javax.inject.Inject
 
 @HiltViewModel
@@ -74,6 +75,13 @@ class FeedViewModel @Inject constructor(
         )
     )
 
+    private val intentHandlers: Map<KClass<out FeedIntent>, (FeedIntent) -> Unit> = mapOf(
+        FeedIntent.SymbolClicked::class to { e ->
+            _feedSideEffect.tryEmit(FeedSideEffect.NavigateToDetailPage((e as FeedIntent.SymbolClicked).id))
+        },
+        FeedIntent.ToggleConnection::class to { _ -> toggleFeed() }
+    )
+
     init {
         observePriceUpdates()
         observeErrors()
@@ -90,12 +98,8 @@ class FeedViewModel @Inject constructor(
     }
 
     fun sendIntent(intent: FeedIntent) {
-        when (intent) {
-            is FeedIntent.SymbolClicked -> _feedSideEffect.tryEmit(
-                FeedSideEffect.NavigateToDetailPage(intent.id)
-            )
-            FeedIntent.ToggleConnection -> toggleFeed()
-        }
+        intentHandlers[intent::class]?.invoke(intent)
+            ?: error("No handler registered for intent: ${intent::class.simpleName}")
     }
 
     private fun toggleFeed() {

@@ -5,51 +5,44 @@ sealed class AppException(
     cause: Throwable? = null
 ) : Exception(message, cause) {
 
+    abstract val userMessage: String
+
     class HttpException(
         val code: Int,
         message: String
-    ) : AppException("HTTP $code: $message")
+    ) : AppException("HTTP $code: $message") {
+        override val userMessage: String get() = "Request failed: ${this.message ?: "Error $code"}"
+    }
 
-    /** A network-level I/O failure occurred while making an HTTP request. */
     class NetworkException(
         message: String,
         cause: Throwable
-    ) : AppException(message, cause)
+    ) : AppException(message, cause) {
+        override val userMessage: String = "Network error. Check your connection."
+    }
 
-    // ── WebSocket ────────────────────────────────────────────────────────────
-
-    /** The WebSocket handshake / TCP connection failed. */
     class WebSocketConnectionFailed(
         message: String,
         cause: Throwable? = null
-    ) : AppException(message, cause)
+    ) : AppException(message, cause) {
+        override val userMessage: String get() = "Connection failed: ${this.message ?: "Unknown error"}"
+    }
 
-    /**
-     * A WebSocket message could not be parsed into the expected format.
-     * @param raw the original raw string that was rejected.
-     */
     class WebSocketMessageParseError(
         val raw: String
-    ) : AppException("Cannot parse WebSocket message: \"$raw\"")
+    ) : AppException("Cannot parse WebSocket message: \"$raw\"") {
+        override val userMessage: String = "Invalid data received"
+    }
 
-    /**
-     * The WebSocket connection was closed with a non-normal close code.
-     * Code 1000 is a clean close; any other code is considered unexpected.
-     */
     class WebSocketClosedUnexpectedly(
         val code: Int,
         val reason: String
-    ) : AppException("WebSocket closed unexpectedly — code=$code reason=\"$reason\"")
+    ) : AppException("WebSocket closed unexpectedly — code=$code reason=\"$reason\"") {
+        override val userMessage: String get() = "Connection closed: $reason"
+    }
 }
 
-/**
- * Returns a short, user-friendly message suitable for toasts or snackbars.
- */
 fun Throwable.userMessage(): String = when (this) {
-    is AppException.HttpException -> "Request failed: ${message ?: "Error $code"}"
-    is AppException.NetworkException -> "Network error. Check your connection."
-    is AppException.WebSocketConnectionFailed -> "Connection failed: ${message ?: "Unknown error"}"
-    is AppException.WebSocketMessageParseError -> "Invalid data received"
-    is AppException.WebSocketClosedUnexpectedly -> "Connection closed: $reason"
+    is AppException -> userMessage
     else -> message ?: "Something went wrong"
 }
