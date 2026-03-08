@@ -21,4 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Multibank-PriceTracker"
 include(":app")
+include(":domain")
+include(":data")
  
