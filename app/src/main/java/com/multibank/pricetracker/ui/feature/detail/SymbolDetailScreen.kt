@@ -36,6 +36,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -54,7 +56,7 @@ import com.multibank.pricetracker.ui.util.formatPriceChange
 @Composable
 fun SymbolDetailScreen(
     onBackClick: () -> Unit,
-    viewModel: DetailViewModel = hiltViewModel()
+    viewModel: DetailViewModelContract = hiltViewModel<DetailViewModel>()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val stock = uiState.stock
@@ -89,11 +91,15 @@ fun SymbolDetailScreen(
                     Text(
                         text = stock?.symbol ?: "",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 22.sp
+                        fontSize = 22.sp,
+                        modifier = Modifier.semantics { testTag = "detail_symbol_title" }
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { viewModel.sendIntent(DetailIntent.NavigateBack) }) {
+                    IconButton(
+                        onClick = { viewModel.sendIntent(DetailIntent.NavigateBack) },
+                        modifier = Modifier.semantics { testTag = "detail_back_button" }
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"

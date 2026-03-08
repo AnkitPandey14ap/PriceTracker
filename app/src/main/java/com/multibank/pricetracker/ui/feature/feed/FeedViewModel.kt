@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.reflect.KClass
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,7 +38,7 @@ class FeedViewModel @Inject constructor(
     private val observePriceUpdatesUseCase: ObservePriceUpdatesUseCase,
     private val observeConnectionStateUseCase: ObserveConnectionStateUseCase,
     private val observePriceFeedErrorsUseCase: ObservePriceFeedErrorsUseCase
-) : ViewModel() {
+) : ViewModel(), FeedViewModelContract {
 
     private val flashJobs = mutableMapOf<String, Job>()
 
@@ -48,20 +47,19 @@ class FeedViewModel @Inject constructor(
 
     private val _stocksFlow = MutableStateFlow(initialStocks)
     private val _feedSideEffect = MutableSharedFlow<FeedSideEffect>()
-    val feedSideEffect = _feedSideEffect.asSharedFlow()
+    override val feedSideEffect = _feedSideEffect.asSharedFlow()
 
     private val _flashMap = MutableStateFlow<Map<String, Boolean?>>(emptyMap())
     private val _isFeedRunning = MutableStateFlow(false)
 
-    val uiState: StateFlow<FeedUiState> = combine(
+    override val uiState: StateFlow<FeedUiState> = combine(
         _stocksFlow,
         observeConnectionStateUseCase(),
         _isFeedRunning,
         _flashMap
     ) { stocks, connectionState, isRunning, flashMap ->
         FeedUiState(
-            stocks = stocks.sortedByDescending { it.currentPrice }
-                .map { with(FeedMapper) { it.toFeedItemUi() } },
+            stocks = stocks.map { with(FeedMapper) { it.toFeedItemUi() } },
             connectionState = with(FeedMapper) { connectionState.toConnectionStateUi() },
             isFeedRunning = isRunning,
             flashMap = flashMap
@@ -70,8 +68,7 @@ class FeedViewModel @Inject constructor(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = FeedUiState(
-            stocks = initialStocks.sortedByDescending { it.currentPrice }
-                .map { with(FeedMapper) { it.toFeedItemUi() } }
+            stocks = initialStocks.map { with(FeedMapper) { it.toFeedItemUi() } }
         )
     )
 
@@ -90,10 +87,10 @@ class FeedViewModel @Inject constructor(
         }
     }
 
-    fun sendIntent(intent: FeedIntent) {
+    override fun sendIntent(intent: FeedIntent) {
         when (intent) {
             is FeedIntent.SymbolClicked -> _feedSideEffect.tryEmit(
-                FeedSideEffect.NavigateToDetailPage(intent.id)
+                FeedSideEffect.NavigateToDetailPage(intent.symbol)
             )
             FeedIntent.ToggleConnection -> toggleFeed()
         }

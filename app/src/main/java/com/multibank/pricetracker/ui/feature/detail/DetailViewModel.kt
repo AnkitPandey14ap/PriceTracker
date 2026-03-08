@@ -35,7 +35,7 @@ class DetailViewModel @Inject constructor(
     getInitialSymbolsUseCase: GetInitialSymbolsUseCase,
     private val observePriceUpdatesUseCase: ObservePriceUpdatesUseCase,
     observeConnectionStateUseCase: ObserveConnectionStateUseCase
-) : ViewModel() {
+) : ViewModel(), DetailViewModelContract {
 
     private val symbol: String = checkNotNull(savedStateHandle["symbol"])
 
@@ -44,9 +44,9 @@ class DetailViewModel @Inject constructor(
     private val _flash = MutableStateFlow<Boolean?>(null)
 
     private val _detailSideEffect = MutableSharedFlow<DetailSideEffect>()
-    val detailSideEffect = _detailSideEffect.asSharedFlow()
+    override val detailSideEffect = _detailSideEffect.asSharedFlow()
 
-    val uiState: StateFlow<DetailUiState> = combine(
+    override val uiState: StateFlow<DetailUiState> = combine(
         _stock,
         _flash,
         observeConnectionStateUseCase()
@@ -68,7 +68,7 @@ class DetailViewModel @Inject constructor(
         observeUpdates()
     }
 
-    fun sendIntent(intent: DetailIntent) {
+    override fun sendIntent(intent: DetailIntent) {
         when (intent) {
             DetailIntent.NavigateBack -> viewModelScope.launch {
                 _detailSideEffect.emit(DetailSideEffect.NavigateBack)

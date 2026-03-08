@@ -41,6 +41,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -58,7 +60,7 @@ import com.multibank.pricetracker.ui.util.formatPriceChange
 @Composable
 fun FeedScreen(
     onSymbolClick: (String) -> Unit,
-    viewModel: FeedViewModel = hiltViewModel()
+    viewModel: FeedViewModelContract = hiltViewModel<FeedViewModel>()
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -89,7 +91,8 @@ fun FeedScreen(
                 actions = {
                     ToggleFeedButton(
                         isRunning = uiState.isFeedRunning,
-                        onClick = { viewModel.sendIntent(FeedIntent.ToggleConnection) }
+                        onClick = { viewModel.sendIntent(FeedIntent.ToggleConnection) },
+                        modifier = Modifier.semantics { testTag = "feed_toggle_button" }
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                 },
@@ -132,7 +135,11 @@ fun FeedScreen(
 
 
 @Composable
-private fun ToggleFeedButton(isRunning: Boolean, onClick: () -> Unit) {
+private fun ToggleFeedButton(
+    isRunning: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val containerColor = if (isRunning) {
         MaterialTheme.colorScheme.errorContainer
     } else {
@@ -146,6 +153,7 @@ private fun ToggleFeedButton(isRunning: Boolean, onClick: () -> Unit) {
 
     Button(
         onClick = onClick,
+        modifier = modifier,
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
             contentColor = contentColor
