@@ -1,7 +1,7 @@
 package com.multibank.pricetracker.di
 
-import com.multibank.pricetracker.core.DefaultWebSocketEventInterceptor
-import com.multibank.pricetracker.core.WebSocketEventInterceptor
+import com.multibank.pricetracker.data.core.DefaultWebSocketEventInterceptor
+import com.multibank.pricetracker.data.core.WebSocketEventInterceptor
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

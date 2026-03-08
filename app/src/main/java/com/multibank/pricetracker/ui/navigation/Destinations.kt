@@ -1,4 +1,4 @@
-package com.multibank.pricetracker.navigation
+package com.multibank.pricetracker.ui.navigation
 
 sealed class Destinations(val route: String) {
     data object Feed : Destinations("feed")

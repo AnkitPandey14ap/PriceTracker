@@ -1,4 +1,4 @@
-package com.multibank.pricetracker.core
+package com.multibank.pricetracker.data.core
 
 import okhttp3.Interceptor
 import okhttp3.Response

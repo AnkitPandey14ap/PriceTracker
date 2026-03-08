@@ -1,4 +1,4 @@
-package com.multibank.pricetracker.core
+package com.multibank.pricetracker.data.core
 
 sealed class AppException(
     message: String,

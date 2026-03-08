@@ -1,9 +1,9 @@
 package com.multibank.pricetracker.data.datasource.websocket
 
 import android.util.Log
-import com.multibank.pricetracker.core.AppException
-import com.multibank.pricetracker.core.userMessage
-import com.multibank.pricetracker.core.WebSocketEventInterceptor
+import com.multibank.pricetracker.data.core.AppException
+import com.multibank.pricetracker.data.core.userMessage
+import com.multibank.pricetracker.data.core.WebSocketEventInterceptor
 import com.multibank.pricetracker.domain.model.ConnectionStateEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

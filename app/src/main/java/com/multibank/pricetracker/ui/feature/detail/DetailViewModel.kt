@@ -1,17 +1,17 @@
-package com.multibank.pricetracker.ui.detail
+package com.multibank.pricetracker.ui.feature.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.multibank.pricetracker.Constants.Companion.FLASH_THRESHOLD_PERCENT
+import com.multibank.pricetracker.ui.common.Constants.Companion.FLASH_THRESHOLD_PERCENT
 import com.multibank.pricetracker.domain.usecase.GetInitialSymbolsUseCase
 import com.multibank.pricetracker.domain.model.PriceDirectionEntity
 import com.multibank.pricetracker.domain.model.StockSymbolEntity
 import com.multibank.pricetracker.domain.usecase.ObserveConnectionStateUseCase
 import com.multibank.pricetracker.domain.usecase.ObservePriceUpdatesUseCase
-import com.multibank.pricetracker.ui.feed.FeedMapper
-import com.multibank.pricetracker.ui.feed.bean.ConnectionStateUi
-import com.multibank.pricetracker.ui.feed.bean.FeedItemUi
+import com.multibank.pricetracker.ui.feature.feed.FeedMapper
+import com.multibank.pricetracker.ui.feature.feed.bean.ConnectionStateUi
+import com.multibank.pricetracker.ui.feature.feed.bean.FeedItemUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

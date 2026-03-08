@@ -1,4 +1,4 @@
-package com.multibank.pricetracker.navigation
+package com.multibank.pricetracker.ui.navigation
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
@@ -8,8 +8,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.multibank.pricetracker.ui.detail.SymbolDetailScreen
-import com.multibank.pricetracker.ui.feed.FeedScreen
+import com.multibank.pricetracker.ui.feature.detail.SymbolDetailScreen
+import com.multibank.pricetracker.ui.feature.feed.FeedScreen
 
 
 

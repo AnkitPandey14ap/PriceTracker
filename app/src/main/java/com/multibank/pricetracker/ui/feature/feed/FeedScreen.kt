@@ -1,4 +1,4 @@
-package com.multibank.pricetracker.ui.feed
+package com.multibank.pricetracker.ui.feature.feed
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.EaseInOut
@@ -43,15 +43,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.multibank.pricetracker.ToastHelper
-import com.multibank.pricetracker.ui.feed.mvi.FeedIntent
-import com.multibank.pricetracker.ui.feed.mvi.FeedSideEffect
-import com.multibank.pricetracker.ui.feed.bean.ConnectionStateUi
+import com.multibank.pricetracker.ui.common.ToastHelper
+import com.multibank.pricetracker.ui.feature.feed.mvi.FeedIntent
+import com.multibank.pricetracker.ui.feature.feed.mvi.FeedSideEffect
+import com.multibank.pricetracker.ui.feature.feed.bean.ConnectionStateUi
 import kotlin.reflect.KClass
-import com.multibank.pricetracker.ui.feed.bean.FeedItemUi
-import com.multibank.pricetracker.ui.feed.bean.PriceDirectionUi
-import com.multibank.pricetracker.util.formatPrice
-import com.multibank.pricetracker.util.formatPriceChange
+import com.multibank.pricetracker.ui.feature.feed.bean.FeedItemUi
+import com.multibank.pricetracker.ui.feature.feed.bean.PriceDirectionUi
+import com.multibank.pricetracker.ui.util.formatPrice
+import com.multibank.pricetracker.ui.util.formatPriceChange
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

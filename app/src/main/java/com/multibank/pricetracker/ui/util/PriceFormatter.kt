@@ -1,4 +1,4 @@
-package com.multibank.pricetracker.util
+package com.multibank.pricetracker.ui.util
 
 import kotlin.math.abs
 

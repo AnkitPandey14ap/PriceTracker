@@ -1,4 +1,4 @@
-package com.multibank.pricetracker.ui.feed.mvi
+package com.multibank.pricetracker.ui.feature.feed.mvi
 
 sealed class FeedSideEffect {
     data class NavigateToDetailPage(val id: String) : FeedSideEffect()

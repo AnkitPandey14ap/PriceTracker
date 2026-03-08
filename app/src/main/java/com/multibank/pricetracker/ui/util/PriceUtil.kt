@@ -1,4 +1,4 @@
-package com.multibank.pricetracker.util
+package com.multibank.pricetracker.ui.util
 
 import com.multibank.pricetracker.domain.model.PriceDirectionEntity
 import kotlin.math.abs

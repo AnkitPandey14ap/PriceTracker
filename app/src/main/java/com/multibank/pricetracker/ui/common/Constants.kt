@@ -1,4 +1,4 @@
-package com.multibank.pricetracker
+package com.multibank.pricetracker.ui.common
 
 class Constants {
     companion object{

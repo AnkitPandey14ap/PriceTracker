@@ -1,4 +1,4 @@
-package com.multibank.pricetracker
+package com.multibank.pricetracker.ui.common
 
 import android.content.Context
 import android.os.Handler

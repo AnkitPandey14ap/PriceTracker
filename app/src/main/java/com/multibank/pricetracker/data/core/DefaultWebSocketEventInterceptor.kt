@@ -1,4 +1,4 @@
-package com.multibank.pricetracker.core
+package com.multibank.pricetracker.data.core
 
 import android.util.Log
 import okhttp3.Response

@@ -1,11 +1,11 @@
-package com.multibank.pricetracker.ui.feed
+package com.multibank.pricetracker.ui.feature.feed
 
 import com.multibank.pricetracker.domain.model.ConnectionStateEntity
 import com.multibank.pricetracker.domain.model.PriceDirectionEntity
 import com.multibank.pricetracker.domain.model.StockSymbolEntity
-import com.multibank.pricetracker.ui.feed.bean.ConnectionStateUi
-import com.multibank.pricetracker.ui.feed.bean.FeedItemUi
-import com.multibank.pricetracker.ui.feed.bean.PriceDirectionUi
+import com.multibank.pricetracker.ui.feature.feed.bean.ConnectionStateUi
+import com.multibank.pricetracker.ui.feature.feed.bean.FeedItemUi
+import com.multibank.pricetracker.ui.feature.feed.bean.PriceDirectionUi
 
 object FeedMapper {
 

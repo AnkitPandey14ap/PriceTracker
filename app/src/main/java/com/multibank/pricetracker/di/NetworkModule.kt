@@ -1,6 +1,6 @@
 package com.multibank.pricetracker.di
 
-import com.multibank.pricetracker.core.AppHttpInterceptor
+import com.multibank.pricetracker.data.core.AppHttpInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
