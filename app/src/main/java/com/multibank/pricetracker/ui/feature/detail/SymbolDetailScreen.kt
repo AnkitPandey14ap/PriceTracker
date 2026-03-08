@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.multibank.pricetracker.ui.feature.detail.mvi.DetailIntent
+import com.multibank.pricetracker.ui.feature.detail.mvi.DetailSideEffect
 import com.multibank.pricetracker.ui.feature.feed.bean.ConnectionStateUi
 import com.multibank.pricetracker.ui.feature.feed.bean.FeedItemUi
 import com.multibank.pricetracker.ui.feature.feed.bean.PriceDirectionUi
@@ -55,6 +58,14 @@ fun SymbolDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val stock = uiState.stock
+
+    LaunchedEffect(Unit) {
+        viewModel.detailSideEffect.collect {
+            when (it) {
+                DetailSideEffect.NavigateBack -> onBackClick()
+            }
+        }
+    }
 
     val defaultBg = MaterialTheme.colorScheme.background
     val flashGreen = Color(0xFF4CAF50).copy(alpha = 0.10f)
@@ -82,7 +93,7 @@ fun SymbolDetailScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
+                    IconButton(onClick = { viewModel.sendIntent(DetailIntent.NavigateBack) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"

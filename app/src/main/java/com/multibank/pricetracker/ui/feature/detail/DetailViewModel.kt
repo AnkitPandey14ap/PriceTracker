@@ -9,26 +9,25 @@ import com.multibank.pricetracker.domain.model.PriceDirectionEntity
 import com.multibank.pricetracker.domain.model.StockSymbolEntity
 import com.multibank.pricetracker.domain.usecase.ObserveConnectionStateUseCase
 import com.multibank.pricetracker.domain.usecase.ObservePriceUpdatesUseCase
+import com.multibank.pricetracker.ui.feature.detail.mvi.DetailIntent
+import com.multibank.pricetracker.ui.feature.detail.mvi.DetailSideEffect
+import com.multibank.pricetracker.ui.feature.detail.mvi.DetailUiState
 import com.multibank.pricetracker.ui.feature.feed.FeedMapper
 import com.multibank.pricetracker.ui.feature.feed.bean.ConnectionStateUi
 import com.multibank.pricetracker.ui.feature.feed.bean.FeedItemUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.abs
-
-data class DetailUiState(
-    val stock: FeedItemUi? = null,
-    val flash: Boolean? = null,
-    val connectionState: ConnectionStateUi = ConnectionStateUi.Disconnected
-)
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
@@ -43,6 +42,9 @@ class DetailViewModel @Inject constructor(
     private val initialStock: StockSymbolEntity = getInitialSymbolsUseCase().first { it.symbol == symbol }
     private val _stock = MutableStateFlow(initialStock)
     private val _flash = MutableStateFlow<Boolean?>(null)
+
+    private val _detailSideEffect = MutableSharedFlow<DetailSideEffect>()
+    val detailSideEffect = _detailSideEffect.asSharedFlow()
 
     val uiState: StateFlow<DetailUiState> = combine(
         _stock,
@@ -64,6 +66,14 @@ class DetailViewModel @Inject constructor(
 
     init {
         observeUpdates()
+    }
+
+    fun sendIntent(intent: DetailIntent) {
+        when (intent) {
+            DetailIntent.NavigateBack -> viewModelScope.launch {
+                _detailSideEffect.emit(DetailSideEffect.NavigateBack)
+            }
+        }
     }
 
     private fun observeUpdates() {

@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -203,7 +204,7 @@ private fun StockRow(
             .fillMaxWidth()
             .padding(horizontal = 12.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(CornerSize(4)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = animatedCardColor)
     ) {
