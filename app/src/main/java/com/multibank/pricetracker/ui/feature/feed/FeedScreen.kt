@@ -200,11 +200,12 @@ private fun StockRow(
     )
 
     Card(
+        shape = RoundedCornerShape(CornerSize(4)),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(CornerSize(4)),
+
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = animatedCardColor)
     ) {
