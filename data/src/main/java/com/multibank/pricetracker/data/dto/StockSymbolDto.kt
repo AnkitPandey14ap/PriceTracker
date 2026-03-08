@@ -6,8 +6,4 @@ data class StockSymbolDto(
     val previousPrice: Double,
     val direction: PriceDirectionDto = PriceDirectionDto.NEUTRAL,
     val description: String = ""
-) {
-    val priceChange: Double get() = currentPrice - previousPrice
-    val priceChangePercent: Double
-        get() = if (previousPrice != 0.0) (priceChange / previousPrice) * 100.0 else 0.0
-}
+)
