@@ -16,7 +16,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.multibank.pricetracker.R
 import com.multibank.pricetracker.ui.feature.feed.bean.ConnectionStateUi
 
 /**
@@ -33,9 +35,9 @@ fun ConnectionStatusRow(
         is ConnectionStateUi.Connecting -> Color(0xFFFF9800)
     }
     val stateLabel = when (connectionState) {
-        is ConnectionStateUi.Connected -> "Live"
-        is ConnectionStateUi.Disconnected -> "Disconnected"
-        is ConnectionStateUi.Connecting -> "Connecting…"
+        is ConnectionStateUi.Connected -> stringResource(R.string.connection_live)
+        is ConnectionStateUi.Disconnected -> stringResource(R.string.connection_disconnected)
+        is ConnectionStateUi.Connecting -> stringResource(R.string.connection_connecting)
     }
 
     Row(

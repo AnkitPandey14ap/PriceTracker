@@ -21,9 +21,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.multibank.pricetracker.R
 import com.multibank.pricetracker.ui.feature.feed.bean.FeedItemUi
 import com.multibank.pricetracker.ui.util.formatPrice
 import com.multibank.pricetracker.ui.util.formatPriceChange
@@ -79,7 +81,7 @@ fun StockRow(
 @Composable
 private fun RankBadge(rank: Int) {
     Text(
-        text = "#$rank",
+        text = stringResource(R.string.feed_rank_format, rank),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.width(32.dp)

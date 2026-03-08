@@ -7,8 +7,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.multibank.pricetracker.R
 
 /**
  * Start/Stop feed control button. Shows "▶ Start" or "⏹ Stop" based on [isRunning].
@@ -40,7 +42,7 @@ fun ToggleFeedButton(
         shape = RoundedCornerShape(8.dp)
     ) {
         Text(
-            text = if (isRunning) "⏹ Stop" else "▶ Start",
+            text = stringResource(if (isRunning) R.string.feed_stop else R.string.feed_start),
             fontWeight = FontWeight.SemiBold
         )
     }

@@ -1,3 +1,28 @@
 <resources>
     <string name="app_name">Multibank-PriceTracker</string>
+
+    <!-- Feed -->
+    <string name="feed_title">Price Tracker</string>
+    <string name="feed_start">▶ Start</string>
+    <string name="feed_stop">⏹ Stop</string>
+    <string name="feed_rank_format">#%1$d</string>
+
+    <!-- Connection state -->
+    <string name="connection_live">Live</string>
+    <string name="connection_disconnected">Disconnected</string>
+    <string name="connection_connecting">Connecting…</string>
+
+    <!-- Detail -->
+    <string name="detail_back">Back</string>
+    <string name="detail_about_symbol">About %1$s</string>
+    <string name="detail_market_stats">Market Stats</string>
+    <string name="detail_label_symbol">Symbol</string>
+    <string name="detail_label_current_price">Current Price</string>
+    <string name="detail_label_previous_price">Previous Price</string>
+    <string name="detail_label_change">Change</string>
+    <string name="detail_previous_price_na">—</string>
+    <string name="detail_footer">Prices update every 2 seconds via WebSocket echo</string>
+
+    <!-- MainActivity (preview) -->
+    <string name="hello_name">Hello %1$s!</string>
 </resources>

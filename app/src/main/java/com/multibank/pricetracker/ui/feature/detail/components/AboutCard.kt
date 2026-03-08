@@ -11,9 +11,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.multibank.pricetracker.R
 import com.multibank.pricetracker.ui.feature.feed.bean.FeedItemUi
 
 @Composable
@@ -31,7 +33,7 @@ fun AboutCard(stock: FeedItemUi) {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "About ${stock.symbol}",
+                text = stringResource(R.string.detail_about_symbol, stock.symbol),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface

@@ -16,8 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.multibank.pricetracker.R
 import com.multibank.pricetracker.ui.feature.feed.bean.ConnectionStateUi
 
 /**
@@ -39,7 +41,7 @@ fun FeedTopBar(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Price Tracker",
+                    text = stringResource(R.string.feed_title),
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
                 )

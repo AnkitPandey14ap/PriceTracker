@@ -11,10 +11,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.multibank.pricetracker.R
 import com.multibank.pricetracker.ui.feature.feed.bean.FeedItemUi
 import com.multibank.pricetracker.ui.util.formatPrice
 import com.multibank.pricetracker.ui.util.formatPriceChange
@@ -39,22 +41,22 @@ fun MarketStatsCard(stock: FeedItemUi) {
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
-                text = "Market Stats",
+                text = stringResource(R.string.detail_market_stats),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            StatRow(label = "Symbol", value = stock.symbol)
+            StatRow(label = stringResource(R.string.detail_label_symbol), value = stock.symbol)
             StatRow(
-                label = "Current Price",
+                label = stringResource(R.string.detail_label_current_price),
                 value = formatPrice(stock.currentPrice),
                 valueTestTag = "detail_stats_current_price"
             )
             StatRow(
-                label = "Previous Price",
-                value = if (stock.previousPrice > 0) formatPrice(stock.previousPrice) else "—"
+                label = stringResource(R.string.detail_label_previous_price),
+                value = if (stock.previousPrice > 0) formatPrice(stock.previousPrice) else stringResource(R.string.detail_previous_price_na)
             )
             StatRow(
-                label = "Change",
+                label = stringResource(R.string.detail_label_change),
                 value = formatPriceChange(stock.priceChange, stock.priceChangePercent)
             )
         }
