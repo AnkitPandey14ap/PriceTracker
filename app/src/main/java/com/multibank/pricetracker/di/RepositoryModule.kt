@@ -1,7 +1,7 @@
 package com.multibank.pricetracker.di
 
-import com.multibank.pricetracker.data.repoImpl.PriceFeedRepositoryImpl
-import com.multibank.pricetracker.domain.PriceFeedRepository
+import com.multibank.pricetracker.data.repository.PriceFeedRepositoryImpl
+import com.multibank.pricetracker.domain.repository.PriceFeedRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

@@ -41,9 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.multibank.pricetracker.ui.feed.model.ConnectionStateUi
-import com.multibank.pricetracker.ui.feed.model.FeedItemUi
-import com.multibank.pricetracker.ui.feed.model.PriceDirectionUi
+import com.multibank.pricetracker.ui.feed.bean.ConnectionStateUi
+import com.multibank.pricetracker.ui.feed.bean.FeedItemUi
+import com.multibank.pricetracker.ui.feed.bean.PriceDirectionUi
 import com.multibank.pricetracker.util.formatPrice
 import com.multibank.pricetracker.util.formatPriceChange
 

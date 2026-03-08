@@ -3,16 +3,19 @@ package com.multibank.pricetracker.ui.feed
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.multibank.pricetracker.Constants.Companion.FLASH_THRESHOLD_PERCENT
-import com.multibank.pricetracker.domain.GetInitialSymbolsUseCase
-import com.multibank.pricetracker.domain.model.PriceDirection
-import com.multibank.pricetracker.domain.model.PriceUpdate
-import com.multibank.pricetracker.domain.model.StockSymbol
-import com.multibank.pricetracker.domain.ObserveConnectionStateUseCase
-import com.multibank.pricetracker.domain.ObservePriceFeedErrorsUseCase
-import com.multibank.pricetracker.domain.ObservePriceUpdatesUseCase
-import com.multibank.pricetracker.domain.StartFeedUseCase
-import com.multibank.pricetracker.domain.StopFeedUseCase
-import com.multibank.pricetracker.ui.feed.mapper.FeedMapper
+import com.multibank.pricetracker.domain.usecase.GetInitialSymbolsUseCase
+import com.multibank.pricetracker.domain.model.PriceDirectionEntity
+import com.multibank.pricetracker.domain.model.PriceUpdateEntity
+import com.multibank.pricetracker.domain.model.StockSymbolEntity
+import com.multibank.pricetracker.domain.usecase.ObserveConnectionStateUseCase
+import com.multibank.pricetracker.domain.usecase.ObservePriceFeedErrorsUseCase
+import com.multibank.pricetracker.domain.usecase.ObservePriceUpdatesUseCase
+import com.multibank.pricetracker.domain.usecase.StartFeedUseCase
+import com.multibank.pricetracker.domain.usecase.StopFeedUseCase
+import com.multibank.pricetracker.ui.feed.mvi.FeedIntent
+import com.multibank.pricetracker.ui.feed.mvi.FeedSideEffect
+import com.multibank.pricetracker.ui.feed.mvi.FeedUiState
+import com.multibank.pricetracker.util.PriceUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -39,7 +42,7 @@ class FeedViewModel @Inject constructor(
 
     private val flashJobs = mutableMapOf<String, Job>()
 
-    private val initialStocks: List<StockSymbol> = getInitialSymbolsUseCase()
+    private val initialStocks: List<StockSymbolEntity> = getInitialSymbolsUseCase()
     private val stockMap = initialStocks.associateBy { it.symbol }.toMutableMap()
 
     private val _stocksFlow = MutableStateFlow(initialStocks)
@@ -56,7 +59,8 @@ class FeedViewModel @Inject constructor(
         _flashMap
     ) { stocks, connectionState, isRunning, flashMap ->
         FeedUiState(
-            stocks = stocks.sortedByDescending { it.currentPrice }.map { with(FeedMapper) { it.toFeedItemUi() } },
+            stocks = stocks.sortedByDescending { it.currentPrice }
+                .map { with(FeedMapper) { it.toFeedItemUi() } },
             connectionState = with(FeedMapper) { connectionState.toConnectionStateUi() },
             isFeedRunning = isRunning,
             flashMap = flashMap
@@ -65,7 +69,8 @@ class FeedViewModel @Inject constructor(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = FeedUiState(
-            stocks = initialStocks.sortedByDescending { it.currentPrice }.map { with(FeedMapper) { it.toFeedItemUi() } }
+            stocks = initialStocks.sortedByDescending { it.currentPrice }
+                .map { with(FeedMapper) { it.toFeedItemUi() } }
         )
     )
 
@@ -117,7 +122,7 @@ class FeedViewModel @Inject constructor(
         }
     }
 
-    private fun processPriceUpdate(update: PriceUpdate) {
+    private fun processPriceUpdate(update: PriceUpdateEntity) {
         val existing = stockMap[update.symbol] ?: return
         val direction = PriceUtil.priceDirection(update.price, existing.currentPrice)
         val updated = existing.copy(
@@ -129,8 +134,8 @@ class FeedViewModel @Inject constructor(
         _stocksFlow.value = stockMap.values.toList()
 
         val changePct = PriceUtil.priceChangePercent(update.price, existing.currentPrice)
-        if (direction != PriceDirection.NEUTRAL && changePct >= FLASH_THRESHOLD_PERCENT) {
-            triggerFlash(update.symbol, direction == PriceDirection.UP)
+        if (direction != PriceDirectionEntity.NEUTRAL && changePct >= FLASH_THRESHOLD_PERCENT) {
+            triggerFlash(update.symbol, direction == PriceDirectionEntity.UP)
         }
     }
 

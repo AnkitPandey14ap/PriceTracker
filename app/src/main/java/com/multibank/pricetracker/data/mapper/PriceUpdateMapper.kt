@@ -1,10 +1,10 @@
 package com.multibank.pricetracker.data.mapper
 
-import com.multibank.pricetracker.data.PriceUpdateDto
-import com.multibank.pricetracker.domain.model.PriceUpdate
+import com.multibank.pricetracker.data.dto.PriceUpdateDto
+import com.multibank.pricetracker.domain.model.PriceUpdateEntity
 
 object PriceUpdateMapper {
 
-    fun toDomain(dto: PriceUpdateDto): PriceUpdate =
-        PriceUpdate(symbol = dto.symbol, price = dto.price)
+    fun toDomain(dto: PriceUpdateDto): PriceUpdateEntity =
+        PriceUpdateEntity(symbol = dto.symbol, price = dto.price)
 }

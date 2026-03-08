@@ -4,14 +4,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.multibank.pricetracker.Constants.Companion.FLASH_THRESHOLD_PERCENT
-import com.multibank.pricetracker.domain.GetInitialSymbolsUseCase
-import com.multibank.pricetracker.domain.model.PriceDirection
-import com.multibank.pricetracker.domain.model.StockSymbol
-import com.multibank.pricetracker.domain.ObserveConnectionStateUseCase
-import com.multibank.pricetracker.domain.ObservePriceUpdatesUseCase
-import com.multibank.pricetracker.ui.feed.mapper.FeedMapper
-import com.multibank.pricetracker.ui.feed.model.ConnectionStateUi
-import com.multibank.pricetracker.ui.feed.model.FeedItemUi
+import com.multibank.pricetracker.domain.usecase.GetInitialSymbolsUseCase
+import com.multibank.pricetracker.domain.model.PriceDirectionEntity
+import com.multibank.pricetracker.domain.model.StockSymbolEntity
+import com.multibank.pricetracker.domain.usecase.ObserveConnectionStateUseCase
+import com.multibank.pricetracker.domain.usecase.ObservePriceUpdatesUseCase
+import com.multibank.pricetracker.ui.feed.FeedMapper
+import com.multibank.pricetracker.ui.feed.bean.ConnectionStateUi
+import com.multibank.pricetracker.ui.feed.bean.FeedItemUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -40,7 +40,7 @@ class DetailViewModel @Inject constructor(
 
     private val symbol: String = checkNotNull(savedStateHandle["symbol"])
 
-    private val initialStock: StockSymbol = getInitialSymbolsUseCase().first { it.symbol == symbol }
+    private val initialStock: StockSymbolEntity = getInitialSymbolsUseCase().first { it.symbol == symbol }
     private val _stock = MutableStateFlow(initialStock)
     private val _flash = MutableStateFlow<Boolean?>(null)
 
@@ -72,9 +72,9 @@ class DetailViewModel @Inject constructor(
                 if (update.symbol != symbol) return@collect
                 val existing = _stock.value
                 val direction = when {
-                    update.price > existing.currentPrice -> PriceDirection.UP
-                    update.price < existing.currentPrice -> PriceDirection.DOWN
-                    else -> PriceDirection.NEUTRAL
+                    update.price > existing.currentPrice -> PriceDirectionEntity.UP
+                    update.price < existing.currentPrice -> PriceDirectionEntity.DOWN
+                    else -> PriceDirectionEntity.NEUTRAL
                 }
                 _stock.value = existing.copy(
                     previousPrice = existing.currentPrice,
@@ -84,8 +84,8 @@ class DetailViewModel @Inject constructor(
                 val changePct = if (existing.currentPrice > 0)
                     abs((update.price - existing.currentPrice) / existing.currentPrice * 100.0)
                 else 0.0
-                if (direction != PriceDirection.NEUTRAL && changePct >= FLASH_THRESHOLD_PERCENT) {
-                    triggerFlash(direction == PriceDirection.UP)
+                if (direction != PriceDirectionEntity.NEUTRAL && changePct >= FLASH_THRESHOLD_PERCENT) {
+                    triggerFlash(direction == PriceDirectionEntity.UP)
                 }
             }
         }

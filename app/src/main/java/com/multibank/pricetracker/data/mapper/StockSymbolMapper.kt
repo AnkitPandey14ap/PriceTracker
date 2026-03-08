@@ -1,14 +1,14 @@
 package com.multibank.pricetracker.data.mapper
 
-import com.multibank.pricetracker.data.PriceDirectionDto
-import com.multibank.pricetracker.data.StockSymbolDto
-import com.multibank.pricetracker.domain.model.PriceDirection
-import com.multibank.pricetracker.domain.model.StockSymbol
+import com.multibank.pricetracker.data.dto.PriceDirectionDto
+import com.multibank.pricetracker.data.dto.StockSymbolDto
+import com.multibank.pricetracker.domain.model.PriceDirectionEntity
+import com.multibank.pricetracker.domain.model.StockSymbolEntity
 
 object StockSymbolMapper {
 
-    fun toDomain(dto: StockSymbolDto): StockSymbol =
-        StockSymbol(
+    fun toDomain(dto: StockSymbolDto): StockSymbolEntity =
+        StockSymbolEntity(
             symbol = dto.symbol,
             currentPrice = dto.currentPrice,
             previousPrice = dto.previousPrice,
@@ -16,7 +16,7 @@ object StockSymbolMapper {
             description = dto.description
         )
 
-    fun toDto(domain: StockSymbol): StockSymbolDto =
+    fun toDto(domain: StockSymbolEntity): StockSymbolDto =
         StockSymbolDto(
             symbol = domain.symbol,
             currentPrice = domain.currentPrice,
@@ -25,15 +25,15 @@ object StockSymbolMapper {
             description = domain.description
         )
 
-    private fun PriceDirectionDto.toDomain(): PriceDirection = when (this) {
-        PriceDirectionDto.UP -> PriceDirection.UP
-        PriceDirectionDto.DOWN -> PriceDirection.DOWN
-        PriceDirectionDto.NEUTRAL -> PriceDirection.NEUTRAL
+    private fun PriceDirectionDto.toDomain(): PriceDirectionEntity = when (this) {
+        PriceDirectionDto.UP -> PriceDirectionEntity.UP
+        PriceDirectionDto.DOWN -> PriceDirectionEntity.DOWN
+        PriceDirectionDto.NEUTRAL -> PriceDirectionEntity.NEUTRAL
     }
 
-    private fun PriceDirection.toDto(): PriceDirectionDto = when (this) {
-        PriceDirection.UP -> PriceDirectionDto.UP
-        PriceDirection.DOWN -> PriceDirectionDto.DOWN
-        PriceDirection.NEUTRAL -> PriceDirectionDto.NEUTRAL
+    private fun PriceDirectionEntity.toDto(): PriceDirectionDto = when (this) {
+        PriceDirectionEntity.UP -> PriceDirectionDto.UP
+        PriceDirectionEntity.DOWN -> PriceDirectionDto.DOWN
+        PriceDirectionEntity.NEUTRAL -> PriceDirectionDto.NEUTRAL
     }
 }
